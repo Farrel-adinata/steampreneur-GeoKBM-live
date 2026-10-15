@@ -5,6 +5,7 @@ dist/
 build/
 .next/
 .cache/
+.claude/
 
 # File rahasia: password, API key, token
 .env
