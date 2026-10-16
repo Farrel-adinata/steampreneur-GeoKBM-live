@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-function haversineMeters(float $lat1, float $lon1, float $lat2, float $lon2): int
+function haversineMeters(float $lat1, float $lon1, float $lat2, float $lon2): float
 {
     $radius = 6371000.0;
     $phi1 = deg2rad($lat1);
@@ -11,7 +11,15 @@ function haversineMeters(float $lat1, float $lon1, float $lat2, float $lon2): in
     $a = sin($deltaPhi / 2) ** 2
         + cos($phi1) * cos($phi2) * sin($deltaLambda / 2) ** 2;
     $a = min(1.0, max(0.0, $a));
-    return (int) round(2 * $radius * atan2(sqrt($a), sqrt(1 - $a)));
+    return 2 * $radius * atan2(sqrt($a), sqrt(1 - $a));
+}
+
+function attendanceRadiusMeters(mixed $configuredRadius): int
+{
+    if ($configuredRadius === null || !is_numeric($configuredRadius)) {
+        return 50;
+    }
+    return min(50, max(0, (int) $configuredRadius));
 }
 
 function cosineSimilarity(array $left, array $right): float

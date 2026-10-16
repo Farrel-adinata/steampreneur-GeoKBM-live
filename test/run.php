@@ -15,8 +15,13 @@ $assert = static function (bool $condition, string $message) use (&$tests, &$fai
     }
 };
 
-$assert(haversineMeters(0, 0, 0, 0) === 0, 'Same-point distance should be zero.');
+$assert(haversineMeters(0, 0, 0, 0) === 0.0, 'Same-point distance should be zero.');
 $assert(haversineMeters(0, 0, 0, 0.001) > 100, 'Haversine distance should use meters.');
+$assert(haversineMeters(0, 0, 0, 0.000449) <= 50, 'Location within 50 meters should pass the distance boundary.');
+$assert(haversineMeters(0, 0, 0, 0.000451) > 50, 'Location beyond 50 meters should exceed the distance boundary.');
+$assert(attendanceRadiusMeters(100) === 50, 'Configured attendance radius must never exceed 50 meters.');
+$assert(attendanceRadiusMeters(25) === 25, 'A stricter configured attendance radius should be preserved.');
+$assert(attendanceRadiusMeters(null) === 50, 'Missing attendance radius should use the 50-meter maximum.');
 $assert(abs(cosineSimilarity([1, 0], [1, 0]) - 1.0) < 1.0e-12, 'Identical vectors should score one.');
 $assert(abs(cosineSimilarity([1, 0], [0, 1])) < 1.0e-12, 'Orthogonal vectors should score zero.');
 $assert(abs(cosineSimilarity([1, 0], [-1, 0]) + 1.0) < 1.0e-12, 'Opposite vectors should score minus one.');

@@ -27,6 +27,11 @@ function formatDateTime(value) {
     : new Intl.DateTimeFormat("id-ID", { dateStyle: "medium", timeStyle: "short" }).format(date);
 }
 
+function showGpsPosition(position) {
+  document.getElementById("gpsSummary").textContent =
+    `Lat: ${position.latitude.toFixed(6)}, Long: ${position.longitude.toFixed(6)} · ±${Math.round(position.accuracy)} m`;
+}
+
 function makeHistoryRecord(row) {
   const record = document.createElement("article");
   record.className = "record";
@@ -92,9 +97,9 @@ async function prepareAttendance() {
     setStatus("Siap diverifikasi", "ok");
     try {
       const position = await GeoGuru.getLocation();
-      document.getElementById("gpsSummary").textContent = `GPS terhubung · ±${Math.round(position.accuracy)} m`;
+      showGpsPosition(position);
     } catch (error) {
-      document.getElementById("gpsSummary").textContent = "Perlu izin lokasi";
+      document.getElementById("gpsSummary").textContent = "Lokasi tidak tersedia";
       GeoGuru.showMessage(dashboardMessage, error.message);
     }
   } catch (error) {
@@ -128,7 +133,7 @@ async function verifyAndAttend() {
     const embedding = await GeoGuru.faceDescriptor(video);
     if (!embedding) throw new Error("Wajah tidak terdeteksi saat mengambil embedding. Coba lagi dengan pencahayaan yang cukup.");
     const location = await GeoGuru.getLocation();
-    document.getElementById("gpsSummary").textContent = `GPS terhubung · ±${Math.round(location.accuracy)} m`;
+    showGpsPosition(location);
     const result = await GeoGuru.api("/api/guru/absen", {
       method: "POST",
       body: {

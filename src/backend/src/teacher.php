@@ -91,14 +91,28 @@ function handleTeacherAttendance(array $body): never
     if (!$school) {
         apiError(503, 'Konfigurasi lokasi sekolah belum tersedia.');
     }
+    if (!is_numeric($school['latitude']) || !is_numeric($school['longitude'])
+        || !is_finite((float) $school['latitude']) || !is_finite((float) $school['longitude'])
+        || (float) $school['latitude'] < -90 || (float) $school['latitude'] > 90
+        || (float) $school['longitude'] < -180 || (float) $school['longitude'] > 180) {
+        apiError(503, 'Titik GPS sekolah pada konfigurasi_sekolah tidak valid. Hubungi admin.');
+    }
     $distance = haversineMeters(
         $latitude,
         $longitude,
         (float) $school['latitude'],
         (float) $school['longitude']
     );
-    if ($distance > (int) $school['radius_meter']) {
-        apiError(403, 'Absensi ditolak karena lokasi berada di luar radius sekolah.');
+    $radius = attendanceRadiusMeters($school['radius_meter'] ?? null);
+    if ($distance > $radius) {
+        apiError(
+            403,
+            sprintf(
+                'Absensi ditolak. Lokasi Anda berjarak %.1f meter dari titik GPS sekolah; batas maksimal adalah %d meter.',
+                $distance,
+                $radius
+            )
+        );
     }
 
     $stmt = $pdo->prepare('SELECT face_embedding FROM guru WHERE id = ? AND status_aktif = 1');
@@ -128,7 +142,7 @@ function handleTeacherAttendance(array $body): never
          (guru_id, latitude_absen, longitude_absen, jarak_dari_sekolah_meter, skor_kemiripan_wajah, status)
          VALUES (?, ?, ?, ?, ?, 'Hadir')"
     );
-    $insert->execute([$actor['id_guru'], $latitude, $longitude, $distance, $score]);
+    $insert->execute([$actor['id_guru'], $latitude, $longitude, (int) round($distance), $score]);
     jsonResponse([
         'status' => 'sukses',
         'pesan' => 'Absensi berhasil dicatat.',

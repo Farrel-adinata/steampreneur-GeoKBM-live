@@ -51,6 +51,7 @@ Frontend pada `localhost` atau `127.0.0.1` menggunakan backend pada port `8000`.
 - Sesi disimpan pada cookie `HttpOnly`; browser mendapatkan CSRF token melalui login atau `GET /api/auth/csrf`.
 - Kirim `X-CSRF-Token` untuk `POST`, `PUT`, dan `DELETE` sesudah login/enrollment CSRF.
 - Guru mengaktifkan akun melalui `POST /api/guru/register` dengan `nip`, `password_polos`, dan `embedding` setelah `GET /api/guru/cek-nip` menampilkan status terdaftar beserta nama guru. Data guru harus dibuat admin lebih dahulu (resource `guru`).
+- Presensi guru membandingkan GPS perangkat dengan titik `latitude`/`longitude` dari `konfigurasi_sekolah`; batas jarak efektif tidak pernah melebihi 50 meter (radius konfigurasi yang lebih kecil tetap berlaku).
 - Tidak tersedia cara aman untuk bootstrap admin otomatis. Admin pertama harus dibuat secara manual melalui proses lokal tepercaya dengan hash password dan role yang disiapkan sesuai schema.
 
 ## Endpoint utama
