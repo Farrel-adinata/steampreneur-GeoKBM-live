@@ -52,6 +52,7 @@ Frontend pada `localhost` atau `127.0.0.1` menggunakan backend pada port `8000`.
 - Kirim `X-CSRF-Token` untuk `POST`, `PUT`, dan `DELETE` sesudah login/enrollment CSRF.
 - Guru mengaktifkan akun melalui `POST /api/guru/register` dengan `nip`, `password_polos`, dan `embedding` setelah `GET /api/guru/cek-nip` menampilkan status terdaftar beserta nama guru. Data guru harus dibuat admin lebih dahulu (resource `guru`).
 - Presensi guru membandingkan GPS perangkat dengan titik `latitude`/`longitude` dari `konfigurasi_sekolah`; batas jarak efektif tidak pernah melebihi 50 meter (radius konfigurasi yang lebih kecil tetap berlaku).
+- Portal siswa khusus ketua kelas menggunakan `POST /api/siswa/login` dengan username, email, atau NIS dan kata sandi. Jadwal, jurnal, dan laporan menggunakan kelas dari sesi login; ID kelas tidak diterima dari browser sebagai dasar otorisasi.
 - Tidak tersedia cara aman untuk bootstrap admin otomatis. Admin pertama harus dibuat secara manual melalui proses lokal tepercaya dengan hash password dan role yang disiapkan sesuai schema.
 
 ## Endpoint utama
@@ -66,9 +67,9 @@ Frontend pada `localhost` atau `127.0.0.1` menggunakan backend pada port `8000`.
 | POST | `/api/guru/absen` | Guru + CSRF |
 | GET | `/api/guru/riwayat` | Guru |
 | GET/PUT | `/api/guru/jurnal` | Guru; PUT + CSRF |
-| POST | `/api/siswa/login` | Login ketua kelas |
-| GET | `/api/siswa/jadwal`, `/api/siswa/jurnal`, `/api/siswa/laporan` | Ketua kelas |
-| POST | `/api/siswa/jurnal` | Ketua kelas + CSRF |
+| POST | `/api/siswa/login` | Ketua kelas; username/email/NIS + kata sandi |
+| GET | `/api/siswa/jadwal?tanggal=...`, `/api/siswa/jurnal?tanggal=...`, `/api/siswa/laporan?tanggal_mulai=...&tanggal_akhir=...` | Ketua kelas; kelas ditentukan dari sesi |
+| POST | `/api/siswa/jurnal` | Ketua kelas + CSRF; menerima tanggal, id_jadwal, status_guru, catatan_siswa |
 | POST | `/api/admin/login` | Login admin |
 | GET/POST/PUT/DELETE | `/api/admin/{resource}` | Admin; mutasi + CSRF |
 | POST | `/api/monitor/login` | Login monitor |

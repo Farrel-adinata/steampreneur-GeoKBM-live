@@ -85,11 +85,19 @@ function actorStillAuthorized(array $actor): bool
     return true;
 }
 
-function loginUser(string $username, string $password, array $allowedRoles): never
+function loginUser(
+    string $username,
+    string $password,
+    array $allowedRoles,
+    bool $allowStudentNis = false
+): never
 {
     if ($username === '' || $password === '') {
         apiError(422, 'username dan password wajib diisi.');
     }
+    $identityCondition = $allowStudentNis
+        ? 'u.username = ? OR u.email = ? OR s.nis = ?'
+        : 'u.username = ? OR u.email = ?';
     $stmt = db()->prepare(
         'SELECT u.id_user, u.username, u.email, u.password_hash, u.id_guru, u.id_siswa, u.is_aktif,
                 g.nama AS nama_guru, g.nip, s.nama_siswa, s.nis, s.id_kelas,
@@ -100,11 +108,15 @@ function loginUser(string $username, string $password, array $allowedRoles): nev
          LEFT JOIN kelas k ON k.id_kelas = s.id_kelas
          LEFT JOIN user_roles ur ON ur.id_user = u.id_user
          LEFT JOIN roles r ON r.id_role = ur.id_role
-         WHERE u.username = ? OR u.email = ?
+         WHERE ' . $identityCondition . '
          GROUP BY u.id_user, u.username, u.email, u.password_hash, u.id_guru, u.id_siswa, u.is_aktif,
                   g.nama, g.nip, s.nama_siswa, s.nis, s.id_kelas, s.is_ketua_kelas, k.nama_kelas'
     );
-    $stmt->execute([$username, $username]);
+    $parameters = [$username, $username];
+    if ($allowStudentNis) {
+        $parameters[] = $username;
+    }
+    $stmt->execute($parameters);
     $row = $stmt->fetch();
     if (!$row || !(int) $row['is_aktif'] || !password_verify($password, (string) $row['password_hash'])) {
         apiError(401, 'Username atau kata sandi salah.');
@@ -154,6 +166,14 @@ function loginUser(string $username, string $password, array $allowedRoles): nev
         $result['data_user'] = ['id_user' => $actor['id'], 'username' => $row['username'], 'role' => $role];
     }
     jsonResponse($result);
+}
+
+function handleStudentLogin(array $body): never
+{
+    $identity = trim((string) (
+        $body['identifier'] ?? $body['username'] ?? $body['nis'] ?? $body['email'] ?? ''
+    ));
+    loginUser($identity, (string) ($body['password'] ?? ''), ['ketua_kelas'], true);
 }
 
 function handleTeacherLogin(array $body): never

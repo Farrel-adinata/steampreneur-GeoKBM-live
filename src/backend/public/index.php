@@ -66,7 +66,7 @@ try {
         handleTeacherLogin($body);
     }
     if ($path === '/api/siswa/login' && $method === 'POST') {
-        loginUser((string) ($body['username'] ?? ''), (string) ($body['password'] ?? ''), ['ketua_kelas', 'siswa']);
+        handleStudentLogin($body);
     }
     if ($path === '/api/admin/login' && $method === 'POST') {
         loginUser((string) ($body['username'] ?? ''), (string) ($body['password'] ?? ''), ['admin']);
