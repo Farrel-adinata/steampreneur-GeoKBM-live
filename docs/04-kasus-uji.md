@@ -8,7 +8,7 @@ Terakhir dijalankan pada 16 Oktober 2026:
 
 | Perintah | Hasil aktual | Cakupan |
 |---|---|---|
-| `node --test test/frontend.test.js` | Lulus, 20 tes (termasuk subtes) | Referensi halaman/aset portal guru dan siswa, target elemen DOM, navigasi dasar onboarding, konfigurasi API, sesi/CSRF API siswa, tampilan nama setelah cek NIP, sintaks JavaScript, dan helper frontend. |
+| `node --test test/frontend.test.js` | Lulus, 22 tes (termasuk subtes) | Referensi halaman/aset portal guru dan siswa, riwayat presensi guru (filter dan CSV), target elemen DOM, navigasi dasar onboarding, konfigurasi API, sesi/CSRF API siswa, tampilan nama setelah cek NIP, sintaks JavaScript, dan helper frontend. |
 | `php test/run.php` | Lulus, 33 pemeriksaan | Jarak Haversine dan batas 50 meter, radius konfigurasi, embedding wajah, status jurnal, tanggal/hari, definisi resource admin, dan struktur schema/migrasi. |
 | `php -l src/backend/src/auth.php` | Lulus | Sintaks handler autentikasi PHP. |
 | `php -l src/backend/public/index.php` | Lulus | Sintaks router API PHP. |
@@ -44,6 +44,7 @@ Isi kolom hasil aktual dan bukti setelah menjalankan skenario manual. Gunakan ak
 | U12 | Batas geofence presensi | Isi `konfigurasi_sekolah` pada database uji. Kirim koordinat guru pada jarak kurang dari 50 m, tepat 50 m, dan lebih dari 50 m; ulangi dengan `radius_meter` konfigurasi lebih kecil dari 50 m. | Jarak dihitung dari titik database sekolah. Jarak sampai batas efektif diterima; jarak di luarnya ditolak HTTP 403 dengan jarak aktual dan batas; batas efektif tidak pernah lebih dari 50 m dan radius yang lebih kecil tetap berlaku. | Helper Haversine dan pembatasan radius lulus pemeriksaan backend; endpoint, penyimpanan log, dan GPS nyata belum diuji dengan fixture. |
 | U13 | Koordinat sekolah kosong/tidak valid | Kosongkan konfigurasi sekolah atau masukkan latitude/longitude di luar rentang pada database uji, lalu coba presensi. | Presensi ditolak HTTP 503 dengan pesan konfigurasi lokasi belum tersedia/tidak valid; tidak ada log presensi baru. | Validasi HTTP/database belum diuji dengan fixture. |
 | U14 | API lokal dan origin browser | Jalankan backend pada port 8000 dan frontend pada origin yang disetel sebagai `APP_ORIGIN`; lakukan preflight dan GET `/api/auth/csrf`. Ulangi dengan origin yang tidak diizinkan. | Origin terdaftar menerima preflight dan respons dengan kredensial; origin berbeda ditolak. URL API lokal mengarah ke backend lokal. | Origin `127.0.0.1:5500`: preflight HTTP 204 dan CSRF HTTP 200; variasi origin terlarang dan konfigurasi deployment belum diuji ulang. |
+| U15 | Riwayat presensi guru, pencarian/filter, dan CSV | Masuk sebagai guru uji, buka Riwayat, cari teks, pilih status/periode tanggal, lalu unduh CSV. Ulangi dengan filter yang tidak menghasilkan baris. | Data hanya milik sesi guru; hasil daftar dan jumlah mengikuti filter; CSV hanya berisi baris yang tampil, header kolom jelas, nilai CSV ter-escape, dan unduh nonaktif jika hasil kosong. | Belum diuji manual dengan API/database; pemfilteran dan ekspor pada data tiruan tercakup tes frontend otomatis. |
 
 ## Petunjuk menjalankan pengujian
 

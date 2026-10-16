@@ -18,6 +18,7 @@ const pageScripts = {
   "register.html": "register.js",
   "home.html": "home.js",
   "jurnal.html": "jurnal.js",
+  "riwayat.html": "riwayat.js",
 };
 
 function readFile(filePath) {
@@ -94,6 +95,126 @@ test("onboarding page links to both portals and its local script/style", () => {
     if (/^(?:https?:|mailto:|tel:|#)/.test(reference)) continue;
     assert.ok(fs.existsSync(path.resolve(frontendRoot, reference)), `onboarding asset exists: ${reference}`);
   }
+});
+
+test("teacher attendance history supports search, filters, and current-view CSV", () => {
+  const html = readFile(path.join(guruRoot, "riwayat.html"));
+  const script = readFile(path.join(javascriptRoot, "riwayat.js"));
+  const requiredControls = [
+    "searchInput",
+    "statusFilter",
+    "startDate",
+    "endDate",
+    "clearFiltersButton",
+    "downloadCsvButton",
+    "historyList",
+  ];
+  for (const id of requiredControls) {
+    assert.match(html, new RegExp(`id="${id}"`), `history page includes #${id}`);
+  }
+  assert.match(script, /\/api\/guru\/riwayat\?limit=100/);
+  assert.match(script, /const shown = visibleRecords\(\)/, "CSV exports the filtered visible records");
+  assert.match(script, /text\.replace\(\/"\/g, '""'\)/, "CSV escapes embedded quotes");
+  assert.match(script, /populateStatusFilter\(\)/, "status filters are based on loaded records");
+  assert.match(script, /createObjectURL\(blob\)/, "CSV is downloaded in the browser");
+  assert.match(html, /CSV berisi baris yang sedang ditampilkan/);
+  assert.match(readFile(path.join(guruRoot, "home.html")), /href="riwayat\.html"/);
+});
+
+test("teacher history filters records and exports only the visible rows", async () => {
+  const html = readFile(path.join(guruRoot, "riwayat.html"));
+  const elements = new Map();
+  const makeElement = id => ({
+    id,
+    value: "",
+    textContent: "",
+    className: "",
+    disabled: false,
+    children: [],
+    listeners: new Map(),
+    addEventListener(eventName, handler) {
+      this.listeners.set(eventName, handler);
+    },
+    append(...children) {
+      this.children.push(...children);
+    },
+    replaceChildren(...children) {
+      this.children = children;
+    },
+    setAttribute() {},
+    click() {
+      this.clicked = true;
+    },
+    remove() {},
+  });
+  const pageIds = Array.from(html.matchAll(/\bid="([^"]+)"/g), match => match[1]);
+  pageIds.forEach(id => elements.set(id, makeElement(id)));
+  const created = [];
+  let downloadedBlob;
+  const context = {
+    document: {
+      getElementById: id => elements.get(id),
+      querySelectorAll: () => [],
+      createElement: tagName => {
+        const element = makeElement(tagName);
+        created.push(element);
+        return element;
+      },
+      body: { append() {} },
+    },
+    window: { location: { replace() {} } },
+    URL: {
+      createObjectURL: blob => {
+        downloadedBlob = blob;
+        return "blob:test";
+      },
+      revokeObjectURL() {},
+    },
+    Blob,
+    Intl,
+    Date,
+    String,
+    Set,
+    Array,
+    Error,
+    Promise,
+    GeoGuru: {
+      currentActor: async () => ({ role: "guru", name: "Guru Uji" }),
+      api: async () => ({
+        riwayat: [
+          { waktu_absen: "2026-10-16 07:00:00", status: "Hadir", jarak_dari_sekolah_meter: 12, skor_kemiripan_wajah: 0.91 },
+          { waktu_absen: "2026-10-15 07:05:00", status: "Terlambat", jarak_dari_sekolah_meter: 18, skor_kemiripan_wajah: 0.88 },
+        ],
+      }),
+      safeCell: (row, key) => row[key] == null ? "—" : String(row[key]),
+      todayISO: () => "2026-10-16",
+      clearMessage() {},
+      showMessage() {},
+      logout: async () => {},
+    },
+  };
+  vm.runInNewContext(readFile(path.join(javascriptRoot, "riwayat.js")), context, {
+    filename: "riwayat.js",
+  });
+  await new Promise(resolve => setTimeout(resolve, 0));
+
+  assert.equal(elements.get("recordCount").textContent, "2 catatan");
+  assert.equal(elements.get("historyList").children.length, 2);
+  assert.deepEqual(
+    elements.get("statusFilter").children.map(option => option.value),
+    ["", "Hadir", "Terlambat"],
+  );
+
+  elements.get("statusFilter").value = "Hadir";
+  elements.get("statusFilter").listeners.get("change")();
+  assert.equal(elements.get("visibleCount").textContent, "1 catatan");
+  assert.equal(elements.get("historyList").children.length, 1);
+
+  elements.get("downloadCsvButton").listeners.get("click")();
+  const csv = await downloadedBlob.text();
+  assert.match(csv, /Waktu presensi/);
+  assert.match(csv, /2026-10-16 07:00:00/);
+  assert.doesNotMatch(csv, /2026-10-15 07:05:00/);
 });
 
 test("onboarding JavaScript supports browsing slides and persists completed intro", () => {

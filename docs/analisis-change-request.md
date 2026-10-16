@@ -4,7 +4,7 @@
 
 Dokumen ini merangkum secara retrospektif change request GeoKBM Live yang dikerjakan selama sesi pengembangan. Dokumen ini **bukan bukti** bahwa analisis telah dibuat atau di-commit sebelum perubahan kode; urutan tersebut hanya dapat dibuktikan dari riwayat commit Git.
 
-Template challenge menyebut pencarian, filter, dan ekspor CSV (Tugas 3). Fitur tersebut **tidak tercantum sebagai kebutuhan GeoKBM Live yang disepakati** dan secara eksplisit berada di luar cakupan pada `docs/01-spesifikasi.md`. Karena tidak ada persetujuan tim atau kriteria khusus untuk fitur tersebut, dokumen ini tidak menganggapnya sebagai perubahan yang telah diterima atau dikerjakan. Minta keputusan tim dan definisikan entitas, hak akses, format CSV, serta kriteria penerimaan sebelum mengimplementasikannya.
+Template challenge menyebut pencarian, filter, dan ekspor CSV (Tugas 3). Paket fitur challenge tersebut **tidak otomatis menjadi kebutuhan GeoKBM Live** dan tidak tercantum dalam spesifikasi awal. Namun, permintaan pengguna pada 16 Oktober 2026 secara eksplisit menyetujui perubahan terbatas untuk pencarian, filter, dan ekspor CSV pada riwayat presensi guru (CR-07 di bawah). Fitur pencarian/filter/ekspor untuk entitas atau portal lain tetap belum disetujui dan memerlukan kriteria serta keputusan tersendiri.
 
 ## Change request yang dikerjakan
 
@@ -16,6 +16,7 @@ Template challenge menyebut pencarian, filter, dan ekspor CSV (Tugas 3). Fitur t
 | CR-04 | Tampilkan koordinat GPS guru yang diperoleh browser pada dashboard guru. | Ringkasan lokasi menampilkan latitude, longitude, dan perkiraan akurasi; diperbarui saat pemeriksaan GPS dan sebelum request presensi. Titik ini adalah lokasi perangkat guru, bukan koordinat sekolah. | Diimplementasikan; tampilan/perangkat GPS nyata belum diuji manual. |
 | CR-05 | Buat portal siswa responsif seperti referensi dan sesuaikan dengan backend. | Menambahkan login, home, jurnal, dan laporan untuk ketua kelas. API memakai sesi/CSRF, membatasi role, dan mengambil kelas dari sesi backend—bukan ID kelas yang dikirim sebagai otorisasi dari browser. Login menerima username, email, atau NIS. | Diimplementasikan; halaman/aset dan alur API teruji secara otomatis. End-to-end dengan akun serta database uji masih diperlukan. |
 | CR-06 | Tambahkan onboarding agar pemilihan portal jelas. | Menambahkan pengenalan tiga slide, navigasi tombol/dots/geser, pilihan portal guru/siswa, dan tautan kembali ke pilihan portal dari halaman login. | Diimplementasikan; navigasi dasar tombol dan Lewati tercakup tes. Gestur sentuh serta perilaku kunjungan ulang belum diverifikasi. |
+| CR-07 | Tambahkan halaman riwayat presensi guru dengan pencarian, filter, dan unduh CSV dari hasil yang sedang tampil. | Halaman memakai `GET /api/guru/riwayat?limit=100`, sehingga hanya memuat catatan sesi guru yang login dan paling banyak 100 catatan terbaru. Pencarian, status, dan rentang tanggal memfilter data termuat; CSV berisi tepat hasil yang tampil. | Diimplementasikan; filtering dan ekspor hasil tersaring tercakup tes frontend. Integrasi akun/database masih perlu uji manual. |
 
 ## Dampak lintas bagian
 
@@ -38,12 +39,13 @@ Template challenge menyebut pencarian, filter, dan ekspor CSV (Tugas 3). Fitur t
 | A04 | Dashboard menampilkan latitude/longitude perangkat saat GPS berhasil didapat dan error yang jelas saat lokasi gagal. | Uji izin GPS dan tampilan pada browser ponsel. | Belum diuji manual pada perangkat. |
 | A05 | Ketua kelas dapat login, membaca jadwal/jurnal/laporan kelasnya, dan menyimpan jurnal tanpa mengakses kelas lain. | Uji akun ketua kelas dan non-ketua, kelas sendiri/lain, serta perubahan jurnal di database uji. | Validasi frontend/API dasar lulus; skenario role dan database belum dijalankan end-to-end. |
 | A06 | Onboarding memberi akses jelas ke login guru/siswa dan dapat digunakan pada ponsel. | Tes link/aset dan navigasi tombol; uji visual dan geser pada perangkat/browser mobile. | Link/aset dan navigasi tombol dasar lulus tes; gestur/visual belum diverifikasi. |
+| A07 | Halaman riwayat hanya menampilkan data guru login; pencarian/status/tanggal memperbarui daftar; CSV berisi baris yang tampil dan dapat dibuka sebagai CSV UTF-8. | Uji akun guru dengan beberapa riwayat, gunakan kombinasi filter, ekspor file, lalu bandingkan jumlah/baris file dengan UI. | Filtering dan ekspor berdasarkan data tiruan lulus tes frontend; akun/API/unduhan browser nyata belum diuji manual. |
 
 ## Tes otomatis yang tersedia
 
 Pada validasi terakhir yang dicatat di `docs/04-kasus-uji.md`:
 
-- `node --test test/frontend.test.js`: 20 tes, lulus.
+- `node --test test/frontend.test.js`: 22 tes, lulus.
 - `php test/run.php`: 33 pemeriksaan, lulus.
 - `php -l src/backend/src/auth.php` dan `php -l src/backend/public/index.php`: sintaks PHP valid.
 
@@ -51,6 +53,6 @@ Hasil unit/helper dan pemeriksaan lokal tidak membuktikan alur end-to-end pada p
 
 ## Keputusan tim yang masih diperlukan
 
-- Setujui atau tolak pencarian/filter/ekspor CSV dari template challenge secara terpisah sebelum implementasi; tetapkan cakupan data, role, format ekspor, serta uji privasi.
+- Pencarian/filter/CSV riwayat guru telah diminta secara spesifik; fitur sejenis untuk entitas atau portal lain tetap perlu persetujuan serta kriteria penerimaan tersendiri.
 - Verifikasi onboarding saat kunjungan ulang: implementasi menyimpan penanda saat Lewati, tetapi status tersimpan belum digunakan untuk memilih slide awal.
-- Jalankan kasus integrasi A01–A06 dengan akun dan database uji; isi bukti/hasil aktual di `docs/04-kasus-uji.md`.
+- Jalankan kasus integrasi A01–A07 dengan akun dan database uji; isi bukti/hasil aktual di `docs/04-kasus-uji.md`.
