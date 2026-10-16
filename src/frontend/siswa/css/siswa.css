@@ -46,6 +46,8 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .button-light { border: 1px solid #ffffff40; background: #ffffff18; box-shadow: none; }
 .button-small { min-height: 38px; padding: 8px 12px; font-size: 12px; }
 .login-footnote { margin: 18px 0 0; color: var(--muted); text-align: center; font-size: 11px; }
+.login-footnote + .login-footnote { margin-top: 8px; }
+.login-footnote .text-link { color: var(--green-dark); text-decoration: none; }
 .notice { margin: 14px 0 0; padding: 11px 13px; border: 1px solid #fecaca; border-radius: 13px; color: #b91c1c; background: #fef2f2; font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
 .notice[hidden] { display: none; }
 .notice.success { border-color: #a7f3d0; color: #047857; background: #ecfdf5; }
