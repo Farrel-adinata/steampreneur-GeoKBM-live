@@ -16,7 +16,7 @@ Repository ini berisi frontend HTML/CSS/JavaScript dan backend PHP dengan MySQL/
 ## Fitur
 
 - Onboarding responsif dengan pilihan portal guru atau siswa.
-- Portal guru: login, aktivasi akun, pendaftaran wajah, presensi wajah + GPS, riwayat presensi, dan jurnal KBM.
+- Portal guru: login, aktivasi akun, pendaftaran wajah, presensi wajah + GPS, jurnal KBM, serta riwayat presensi dengan pencarian, filter, dan unduh CSV untuk baris yang sedang tampil (maksimal 100 catatan terbaru dari API).
 - Portal ketua kelas: login, beranda, jadwal, pengisian status/catatan jurnal, dan laporan.
 - API backend untuk guru, siswa/ketua kelas, admin, dan monitor. Frontend admin dan monitor tidak termasuk dalam `src/frontend` saat ini.
 - Sesi backend memakai cookie `HttpOnly`; operasi yang mengubah data dilindungi token CSRF.
@@ -120,7 +120,7 @@ php -l src\backend\public\index.php
 git diff --check
 ```
 
-Hasil pengujian terakhir yang tercatat: tes frontend lulus (20 tes termasuk subtes), pemeriksaan backend lulus (33 pemeriksaan), dan dua file PHP lolos pemeriksaan sintaks. Angka ini merujuk pada validasi terakhir yang didokumentasikan dan bukan jaminan semua perubahan berikutnya telah diuji.
+Hasil pengujian terakhir yang tercatat: tes frontend lulus (22 tes termasuk subtes), pemeriksaan backend lulus (33 pemeriksaan), dan dua file PHP lolos pemeriksaan sintaks. Angka ini merujuk pada validasi terakhir yang didokumentasikan dan bukan jaminan semua perubahan berikutnya telah diuji.
 
 Tes otomatis saat ini memeriksa struktur/aset halaman, beberapa alur frontend dan API, sintaks JavaScript, serta helper backend seperti jarak, embedding, status jurnal, tanggal, dan schema. Tes tersebut **tidak** menggantikan pengujian end-to-end dengan database uji, akun uji, kamera, GPS, atau ponsel nyata. Skenario integrasi dicatat pada `docs/04-kasus-uji.md`.
 
@@ -160,6 +160,7 @@ Screenshot alur aplikasi tersedia di `docs/bukti/`.
 | Dashboard — bagian 2 | ![Dashboard guru bagian 2](docs/bukti/home-guru-2.png) |
 | Dashboard — bagian 3 | ![Dashboard guru bagian 3](docs/bukti/home-guru-3.png) |
 | Jurnal KBM guru | ![Jurnal guru](docs/bukti/jurnal-guru.png) |
+| Riwayat presensi guru — pencarian dan filter | ![Riwayat presensi guru dengan pencarian dan filter](docs/bukti/riwayat-absen-guru-cari-filter-scv.png) |
 
 ### Portal siswa/ketua kelas
 
@@ -170,6 +171,10 @@ Screenshot alur aplikasi tersedia di `docs/bukti/`.
 | Laporan jurnal KBM | ![Laporan siswa](docs/bukti/laporan-siswa-kbm.png) |
 
 Screenshot merupakan dokumentasi tampilan alur; screenshot saja tidak membuktikan keberhasilan integrasi API atau pengujian end-to-end. Jangan menyertakan bukti yang membocorkan data pribadi, token, kata sandi, atau embedding wajah.
+
+### Bukti pengujian frontend
+
+![Hasil pengujian frontend setelah change request](docs/bukti/Test_frontend_after_change_request.png)
 
 ## Struktur Repository
 
