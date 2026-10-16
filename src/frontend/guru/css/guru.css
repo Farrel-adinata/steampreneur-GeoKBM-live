@@ -121,6 +121,7 @@ h1, h2, h3 { letter-spacing: -.035em; }
 .date-row { display: grid; gap: 8px; }
 .date-row input { min-height: 45px; padding: 10px 13px; border: 1px solid var(--line); border-radius: 14px; background: #f8fafc; }
 .muted { color: var(--muted); }
+.success-text { color: #047857; font-weight: 600; }
 .small { font-size: 12px; }
 .hidden { display: none !important; }
 

@@ -29,65 +29,42 @@ function handleCheckNip(array $query): never
     if ($nip === '') {
         apiError(422, 'Parameter nip wajib diisi.');
     }
-    $stmt = db()->prepare('SELECT 1 FROM guru WHERE nip = ? AND status_aktif = 1 LIMIT 1');
+    $stmt = db()->prepare('SELECT nama FROM guru WHERE nip = ? AND status_aktif = 1 LIMIT 1');
     $stmt->execute([$nip]);
-    jsonResponse(['status' => 'sukses', 'ditemukan' => (bool) $stmt->fetchColumn()]);
+    $nama = $stmt->fetchColumn();
+    jsonResponse([
+        'status' => 'sukses',
+        'ditemukan' => $nama !== false,
+        'nama' => $nama !== false ? (string) $nama : null,
+    ]);
 }
 
 function handleTeacherEnrollment(array $body): never
 {
     $nip = trim((string) ($body['nip'] ?? ''));
     $password = (string) ($body['password_polos'] ?? '');
-    $token = (string) ($body['enrollment_token'] ?? '');
-    if ($nip === '' || $password === '' || $token === '') {
-        apiError(422, 'nip, password_polos, dan enrollment_token wajib diisi.');
+    if ($nip === '' || $password === '') {
+        apiError(422, 'nip dan password_polos wajib diisi.');
     }
     if (strlen($password) < 10) {
         apiError(422, 'Kata sandi minimal 10 karakter.');
     }
-    if (!preg_match('/^[A-Za-z0-9_-]{40,64}$/', $token)) {
-        apiError(422, 'Token enrollment tidak valid.');
-    }
     $embedding = parseEmbedding($body['embedding'] ?? null);
     $pdo = db();
-    $pdo->beginTransaction();
-    try {
-        $stmt = $pdo->prepare(
-            'SELECT t.id, t.guru_id
-             FROM guru_enrollment_tokens t
-             JOIN guru g ON g.id = t.guru_id
-             WHERE g.nip = ? AND t.token_hash = ? AND t.consumed_at IS NULL
-               AND t.expires_at > CURRENT_TIMESTAMP()
-             FOR UPDATE'
-        );
-        $stmt->execute([$nip, hash('sha256', $token)]);
-        $enrollment = $stmt->fetch();
-        if (!$enrollment) {
-            $pdo->rollBack();
-            apiError(403, 'Token enrollment tidak valid, sudah digunakan, atau kedaluwarsa.');
-        }
-        $update = $pdo->prepare(
-            'UPDATE guru SET password_hash = ?, face_embedding = ?, status_aktif = 1 WHERE id = ?'
-        );
-        $update->execute([
-            password_hash($password, PASSWORD_DEFAULT),
-            json_encode($embedding, JSON_THROW_ON_ERROR),
-            (int) $enrollment['guru_id'],
-        ]);
-        $consume = $pdo->prepare(
-            'UPDATE guru_enrollment_tokens SET consumed_at = CURRENT_TIMESTAMP() WHERE id = ? AND consumed_at IS NULL'
-        );
-        $consume->execute([(int) $enrollment['id']]);
-        if ($consume->rowCount() !== 1) {
-            throw new RuntimeException('Enrollment token was consumed concurrently.');
-        }
-        $pdo->commit();
-    } catch (Throwable $error) {
-        if ($pdo->inTransaction()) {
-            $pdo->rollBack();
-        }
-        throw $error;
+    $stmt = $pdo->prepare('SELECT id FROM guru WHERE nip = ? AND status_aktif = 1 LIMIT 1');
+    $stmt->execute([$nip]);
+    $guruId = $stmt->fetchColumn();
+    if ($guruId === false) {
+        apiError(404, 'NIP tidak terdaftar sebagai guru aktif. Hubungi admin untuk mendaftarkan data guru.');
     }
+    $update = $pdo->prepare(
+        'UPDATE guru SET password_hash = ?, face_embedding = ?, status_aktif = 1 WHERE id = ?'
+    );
+    $update->execute([
+        password_hash($password, PASSWORD_DEFAULT),
+        json_encode($embedding, JSON_THROW_ON_ERROR),
+        (int) $guruId,
+    ]);
     jsonResponse(['status' => 'sukses', 'pesan' => 'Aktivasi akun dan enrollment wajah berhasil.']);
 }
 

@@ -22,7 +22,9 @@
         body: options.body === undefined ? undefined : JSON.stringify(options.body),
       });
     } catch {
-      throw new Error("Tidak dapat terhubung ke server. Periksa koneksi dan konfigurasi API.");
+      throw new Error(
+        `Tidak dapat terhubung ke API di ${apiBase}. Pastikan backend berjalan, API_BASE benar, dan origin frontend diizinkan oleh APP_ORIGIN.`,
+      );
     }
     const raw = await response.text();
     let data;

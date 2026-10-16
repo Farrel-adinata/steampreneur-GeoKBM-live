@@ -17,7 +17,7 @@
       <section class="auth-card">
         <p class="eyebrow">Aktivasi wajah · 1 dari 2</p>
         <h1>Siapkan akun guru</h1>
-        <p class="lead">Aktivasi hanya untuk guru yang datanya telah didaftarkan admin. Minta token satu kali dari admin sebelum melanjutkan.</p>
+        <p class="lead">Aktivasi hanya untuk guru yang datanya telah didaftarkan admin. Masukkan NIP, periksa nama Anda, lalu buat kata sandi dan daftarkan wajah.</p>
         <div id="registerMessage" class="notice" role="alert" aria-live="polite" hidden></div>
 
         <form id="identityForm" class="form-stack" novalidate>
@@ -27,11 +27,11 @@
               <input id="nip" name="nip" autocomplete="username" inputmode="numeric" maxlength="50" required placeholder="Masukkan NIP terdaftar">
               <button class="button secondary" id="checkNipButton" type="button">Cek</button>
             </div>
-            <p class="small muted" id="nipResult" aria-live="polite">Pengecekan hanya menampilkan status terdaftar, bukan data profil.</p>
+            <p class="small muted" id="nipResult" aria-live="polite">Klik Cek untuk memastikan NIP terdaftar beserta nama guru.</p>
           </div>
           <div class="field">
-            <label for="enrollmentToken">Token aktivasi sekali pakai</label>
-            <input id="enrollmentToken" autocomplete="one-time-code" required minlength="40" maxlength="64" placeholder="Token yang diberikan admin">
+            <label for="teacherName">Nama guru</label>
+            <input id="teacherName" name="teacherName" type="text" autocomplete="off" disabled placeholder="Nama guru akan tampil setelah NIP dicek">
           </div>
           <div class="field">
             <label for="password">Buat kata sandi</label>

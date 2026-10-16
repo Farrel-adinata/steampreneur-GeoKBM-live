@@ -73,45 +73,6 @@ function handleAdminResource(string $resource, string $method, array $query, arr
 {
     $actor = requireActor(['admin']);
     $definitions = adminResourceDefinitions();
-    if ($resource === 'guru-enrollment') {
-        if ($method !== 'POST') {
-            apiError(405, 'Method tidak diizinkan.');
-        }
-        requireCsrf();
-        $teacherId = positiveId($body['guru_id'] ?? 0, 'guru_id');
-        $token = rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '=');
-        $pdo = db();
-        $teacher = $pdo->prepare('SELECT 1 FROM guru WHERE id = ? AND status_aktif = 1');
-        $teacher->execute([$teacherId]);
-        if (!$teacher->fetchColumn()) {
-            apiError(404, 'Data guru aktif tidak ditemukan.');
-        }
-        $pdo->beginTransaction();
-        try {
-            $revoke = $pdo->prepare(
-                'UPDATE guru_enrollment_tokens SET consumed_at = CURRENT_TIMESTAMP()
-                 WHERE guru_id = ? AND consumed_at IS NULL'
-            );
-            $revoke->execute([$teacherId]);
-            $insert = $pdo->prepare(
-                'INSERT INTO guru_enrollment_tokens (guru_id, token_hash, expires_at, created_by)
-                 VALUES (?, ?, DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 20 MINUTE), ?)'
-            );
-            $insert->execute([$teacherId, hash('sha256', $token), $actor['id']]);
-            $pdo->commit();
-        } catch (Throwable $error) {
-            if ($pdo->inTransaction()) {
-                $pdo->rollBack();
-            }
-            throw $error;
-        }
-        jsonResponse([
-            'status' => 'sukses',
-            'pesan' => 'Token enrollment dibuat. Bagikan secara aman kepada guru; token hanya ditampilkan sekali.',
-            'enrollment_token' => $token,
-            'berlaku_detik' => 1200,
-        ], 201);
-    }
     if ($resource === 'jurnal_otomatis') {
         if ($method !== 'GET') {
             apiError(405, 'Method tidak diizinkan.');

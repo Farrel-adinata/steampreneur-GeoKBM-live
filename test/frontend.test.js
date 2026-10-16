@@ -96,6 +96,76 @@ test("page scripts only query elements present in their page", () => {
   }
 });
 
+test("API configuration uses the local backend or deployed page origin", () => {
+  const configScript = readFile(path.join(javascriptRoot, "config.js"));
+  const configure = location => {
+    const context = { window: { location } };
+    vm.runInNewContext(configScript, context, { filename: "config.js" });
+    return context.window.GEOKBM_ENV.API_BASE;
+  };
+
+  assert.equal(
+    configure({ hostname: "localhost", protocol: "http:", origin: "http://localhost:5500" }),
+    "http://localhost:8000",
+  );
+  assert.equal(
+    configure({ hostname: "geokbm.example", protocol: "https:", origin: "https://geokbm.example" }),
+    "https://geokbm.example",
+  );
+});
+
+test("registration displays and clears the checked teacher name", async () => {
+  const html = readFile(path.join(guruRoot, "register.html"));
+  assert.match(html, /id="teacherName"[^>]*disabled/);
+
+  const elements = new Map();
+  const getElementById = id => {
+    if (!elements.has(id)) {
+      const listeners = new Map();
+      elements.set(id, {
+        value: "",
+        disabled: id === "teacherName",
+        textContent: "",
+        className: "",
+        listeners,
+        addEventListener: (eventName, handler) => listeners.set(eventName, handler),
+        classList: { remove() {} },
+        scrollIntoView() {},
+        focus() {},
+      });
+    }
+    return elements.get(id);
+  };
+  const context = {
+    document: { getElementById },
+    window: { addEventListener() {} },
+    GeoGuru: {
+      api: async () => ({ ditemukan: true, nama: "Dewi Lestari" }),
+      clearMessage() {},
+      showMessage() {},
+      stopCamera() {},
+    },
+  };
+  vm.runInNewContext(readFile(path.join(javascriptRoot, "register.js")), context, {
+    filename: "register.js",
+  });
+
+  const nip = getElementById("nip");
+  const name = getElementById("teacherName");
+  const checkButton = getElementById("checkNipButton");
+  nip.value = "198001012005011001";
+  await checkButton.listeners.get("click")();
+
+  assert.equal(name.disabled, true);
+  assert.equal(name.value, "Dewi Lestari");
+  assert.equal(getElementById("continueButton").disabled, false);
+
+  nip.value = "198001012005011002";
+  nip.listeners.get("input")();
+  assert.equal(name.value, "");
+  assert.equal(getElementById("continueButton").disabled, true);
+});
+
 test("all teacher portal JavaScript files parse", () => {
   for (const fileName of fs.readdirSync(javascriptRoot).filter(name => name.endsWith(".js"))) {
     assert.doesNotThrow(
@@ -177,6 +247,19 @@ test("API errors surface server messages and invalid JSON responses", async t =>
 
     await assert.rejects(geoGuru.api("/api/guru/login"), /respons yang tidak valid/);
   });
+});
+
+test("API connection errors identify the configured endpoint", async () => {
+  const { geoGuru } = loadGeoGuru({
+    fetch: async () => {
+      throw new Error("Failed to fetch");
+    },
+  });
+
+  await assert.rejects(
+    geoGuru.api("/api/auth/csrf"),
+    /Tidak dapat terhubung ke API di https:\/\/example\.test\/api-root/,
+  );
 });
 
 test("face embeddings are averaged and normalized", () => {
