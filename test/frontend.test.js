@@ -22,6 +22,7 @@ function readFile(filePath) {
 
 function loadGeoGuru(options = {}) {
   const sessionValues = new Map();
+  if (options.csrfToken) sessionValues.set("geokbm_csrf", options.csrfToken);
   const sessionStorage = {
     getItem(key) {
       return sessionValues.get(key) ?? null;
@@ -129,7 +130,8 @@ test("API requests include the configured base URL and session credentials", asy
 
 test("mutating API requests send JSON and the stored CSRF token", async () => {
   let requestOptions;
-  const { geoGuru, sessionValues } = loadGeoGuru({
+  const { geoGuru } = loadGeoGuru({
+    csrfToken: "test-csrf-token",
     fetch: async (_url, options) => {
       requestOptions = options;
       return {
@@ -139,7 +141,6 @@ test("mutating API requests send JSON and the stored CSRF token", async () => {
       };
     },
   });
-  sessionValues.set("geokbm_csrf", "test-csrf-token");
 
   await geoGuru.api("/api/guru/jurnal", {
     method: "PUT",
