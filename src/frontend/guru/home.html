@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#2563eb">
+  <title>Dashboard Guru — GeoKBM Live</title>
+  <link rel="stylesheet" href="css/guru.css">
+</head>
+<body>
+  <main class="page-shell">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">▦</span>
+        <div><p class="brand-title">GeoKBM Live</p><p class="brand-subtitle">Portal Guru · SMK Negeri 1 Kuwus</p></div>
+      </div>
+      <div class="topbar-actions">
+        <button class="button ghost" id="logoutButton" type="button">Keluar</button>
+      </div>
+    </header>
+
+    <section class="hero">
+      <p class="eyebrow">Dashboard guru</p>
+      <h1 id="teacherGreeting">Memuat akun…</h1>
+      <p id="todayLabel">—</p>
+      <div class="summary-grid">
+        <div class="summary-card"><span class="summary-label">Lokasi GPS</span><span class="summary-value" id="gpsSummary">Belum diperiksa</span></div>
+        <div class="summary-card"><span class="summary-label">Kamera & model</span><span class="summary-value" id="cameraSummary">Belum diaktifkan</span></div>
+        <div class="summary-card"><span class="summary-label">Riwayat hari ini</span><span class="summary-value" id="historySummary">Memuat…</span></div>
+        <div class="summary-card"><span class="summary-label">Aksi</span><span class="summary-value">Verifikasi wajah + lokasi</span></div>
+      </div>
+    </section>
+
+    <div id="dashboardMessage" class="notice" role="status" aria-live="polite" hidden></div>
+
+    <div class="content-grid two-col">
+      <section class="card">
+        <div class="section-heading">
+          <div><p class="eyebrow">Presensi</p><h2>Absen sekarang</h2></div>
+          <span class="status-pill warn" id="verificationStatus">Belum diverifikasi</span>
+        </div>
+        <div class="camera-frame">
+          <video id="attendanceVideo" autoplay muted playsinline aria-label="Pratinjau kamera untuk verifikasi presensi"></video>
+          <div id="cameraOverlay" class="camera-overlay">Aktifkan kamera untuk memulai verifikasi.</div>
+        </div>
+        <p class="camera-caption" id="livenessStatus" aria-live="polite">Sistem akan meminta kamera, menjalankan pemeriksaan gerakan wajah sederhana, lalu mengambil lokasi GPS.</p>
+        <div class="row-actions">
+          <button class="button secondary" id="prepareButton" type="button">Aktifkan kamera & model</button>
+          <button class="button" id="attendanceButton" type="button" disabled>Verifikasi & absen</button>
+          <button class="button ghost hidden" id="cancelVerificationButton" type="button">Batalkan</button>
+        </div>
+        <p class="small muted" style="margin:12px 0 0">Foto tidak dikirim ke server. Backend menerima embedding wajah dan koordinat untuk memeriksa radius sekolah serta mencatat hasil.</p>
+      </section>
+
+      <section class="card">
+        <div class="section-heading">
+          <div><p class="eyebrow">Riwayat</p><h2>Presensi terbaru</h2></div>
+          <button class="button ghost" id="refreshHistoryButton" type="button">Muat ulang</button>
+        </div>
+        <div id="historyList" class="record-list" aria-live="polite">
+          <p class="empty-state">Memuat riwayat presensi…</p>
+        </div>
+        <div class="row-actions">
+          <a class="button secondary" href="jurnal.html">Buka jurnal KBM</a>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <nav class="bottom-nav" aria-label="Navigasi guru">
+    <div class="bottom-nav-inner">
+      <a class="nav-link active" href="home.html" aria-current="page"><span aria-hidden="true">⌂</span><span>Dashboard</span></a>
+      <a class="nav-link" href="jurnal.html"><span aria-hidden="true">▤</span><span>Jurnal</span></a>
+      <a class="nav-link" href="home.html#historyList"><span aria-hidden="true">◷</span><span>Riwayat</span></a>
+      <button class="nav-link logout" id="logoutNavButton" type="button"><span aria-hidden="true">↪</span><span>Keluar</span></button>
+    </div>
+  </nav>
+  <script src="js/config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js" crossorigin="anonymous"></script>
+  <script src="js/shared.js"></script>
+  <script src="js/liveness.js"></script>
+  <script src="js/home.js"></script>
+</body>
+</html>

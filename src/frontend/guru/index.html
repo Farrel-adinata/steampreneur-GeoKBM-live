@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f4f7fb">
+  <title>Masuk Guru — GeoKBM Live</title>
+  <link rel="stylesheet" href="css/guru.css">
+</head>
+<body>
+  <main class="page-shell auth-shell">
+    <div>
+      <header class="brand">
+        <span class="brand-mark" aria-hidden="true">▦</span>
+        <div><p class="brand-title">GeoKBM Live</p><p class="brand-subtitle">SMK Negeri 1 Kuwus · NTT</p></div>
+      </header>
+      <section class="auth-card">
+        <p class="eyebrow">Portal guru</p>
+        <h1>Selamat datang</h1>
+        <p class="lead">Masuk untuk mencatat presensi dan mengisi jurnal mengajar.</p>
+        <div id="formMessage" class="notice" role="alert" aria-live="polite" hidden></div>
+        <form id="loginForm" class="form-stack" novalidate>
+          <div class="field">
+            <label for="nip">Nomor Induk Pegawai (NIP)</label>
+            <input id="nip" name="nip" inputmode="numeric" autocomplete="username" required maxlength="50" placeholder="Masukkan NIP Anda">
+          </div>
+          <div class="field">
+            <label for="password">Kata sandi</label>
+            <input id="password" name="password" type="password" autocomplete="current-password" required>
+          </div>
+          <button class="button" id="loginButton" type="submit">Masuk ke portal guru</button>
+        </form>
+        <p class="auth-footer">Belum mengaktifkan akun? <a class="text-link" href="register.html">Aktivasi wajah guru</a></p>
+      </section>
+      <p class="auth-footer">Presensi berbasis verifikasi wajah dan lokasi sekolah.</p>
+    </div>
+  </main>
+  <script src="js/config.js"></script>
+  <script src="js/shared.js"></script>
+  <script src="js/login.js"></script>
+</body>
+</html>

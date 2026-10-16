@@ -1,0 +1,10 @@
+# Izinkan Apache serve file .onnx dengan MIME type yang benar
+# Dibutuhkan agar ONNX Runtime Web bisa load model di browser
+
+AddType application/octet-stream .onnx
+
+# Izinkan akses file dari JavaScript (CORS untuk localhost)
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, OPTIONS"
+</IfModule>

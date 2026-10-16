@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#2563eb">
+  <title>Jurnal KBM Guru — GeoKBM Live</title>
+  <link rel="stylesheet" href="css/guru.css">
+</head>
+<body>
+  <main class="page-shell">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">▦</span>
+        <div><p class="brand-title">GeoKBM Live</p><p class="brand-subtitle">Portal Guru · Jurnal KBM</p></div>
+      </div>
+      <button class="button ghost" id="logoutButton" type="button">Keluar</button>
+    </header>
+
+    <section class="hero">
+      <p class="eyebrow">Jurnal KBM</p>
+      <h1>Isi jurnal mengajar</h1>
+      <p id="dateHeading">Pilih tanggal dan jadwal Anda.</p>
+    </section>
+    <div id="journalMessage" class="notice" role="status" aria-live="polite" hidden></div>
+
+    <section class="card" style="margin-top:16px">
+      <div class="section-heading"><div><p class="eyebrow">Langkah 1</p><h2>Pilih tanggal</h2></div></div>
+      <div class="field">
+        <label for="journalDate">Tanggal KBM</label>
+        <input id="journalDate" type="date">
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:15px">
+      <div class="section-heading"><div><p class="eyebrow">Langkah 2</p><h2>Jadwal Anda</h2></div><button class="button ghost" id="reloadButton" type="button">Muat ulang</button></div>
+      <div id="slotList" class="slot-list" aria-live="polite"><p class="empty-state">Memuat jadwal…</p></div>
+    </section>
+
+    <section id="journalEditor" class="card hidden" style="margin-top:15px">
+      <div class="section-heading"><div><p class="eyebrow">Langkah 3</p><h2>Catatan pembelajaran</h2></div></div>
+      <div class="journal-info"><strong id="selectedSubject">Pilih jadwal</strong><span id="selectedSchedule">—</span></div>
+      <form id="journalForm" class="journal-form">
+        <div class="field">
+          <label for="materialInput">Materi / pokok bahasan</label>
+          <textarea id="materialInput" maxlength="5000" placeholder="Tuliskan materi yang diajarkan hari ini"></textarea>
+        </div>
+        <div class="field">
+          <label for="teacherNoteInput">Catatan guru <span class="muted">(opsional)</span></label>
+          <textarea id="teacherNoteInput" maxlength="5000" placeholder="Catatan kegiatan atau tindak lanjut"></textarea>
+        </div>
+        <div class="field">
+          <label>Catatan ketua kelas</label>
+          <p class="small muted" id="studentNote">Belum ada catatan siswa.</p>
+        </div>
+        <button class="button" id="saveJournalButton" type="submit">Simpan jurnal guru</button>
+      </form>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" aria-label="Navigasi guru">
+    <div class="bottom-nav-inner">
+      <a class="nav-link" href="home.html"><span aria-hidden="true">⌂</span><span>Dashboard</span></a>
+      <a class="nav-link active" href="jurnal.html" aria-current="page"><span aria-hidden="true">▤</span><span>Jurnal</span></a>
+      <a class="nav-link" href="home.html#historyList"><span aria-hidden="true">◷</span><span>Riwayat</span></a>
+      <button class="nav-link logout" id="logoutNavButton" type="button"><span aria-hidden="true">↪</span><span>Keluar</span></button>
+    </div>
+  </nav>
+  <script src="js/config.js"></script>
+  <script src="js/shared.js"></script>
+  <script src="js/jurnal.js"></script>
+</body>
+</html>

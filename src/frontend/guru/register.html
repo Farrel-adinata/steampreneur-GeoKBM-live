@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f4f7fb">
+  <title>Aktivasi Wajah — GeoKBM Live</title>
+  <link rel="stylesheet" href="css/guru.css">
+</head>
+<body>
+  <main class="page-shell auth-shell">
+    <div>
+      <header class="brand">
+        <span class="brand-mark" aria-hidden="true">▦</span>
+        <div><p class="brand-title">GeoKBM Live</p><p class="brand-subtitle">Aktivasi akun guru</p></div>
+      </header>
+      <section class="auth-card">
+        <p class="eyebrow">Aktivasi wajah · 1 dari 2</p>
+        <h1>Siapkan akun guru</h1>
+        <p class="lead">Aktivasi hanya untuk guru yang datanya telah didaftarkan admin. Minta token satu kali dari admin sebelum melanjutkan.</p>
+        <div id="registerMessage" class="notice" role="alert" aria-live="polite" hidden></div>
+
+        <form id="identityForm" class="form-stack" novalidate>
+          <div class="field">
+            <label for="nip">NIP guru</label>
+            <div style="display:flex;gap:8px">
+              <input id="nip" name="nip" autocomplete="username" inputmode="numeric" maxlength="50" required placeholder="Masukkan NIP terdaftar">
+              <button class="button secondary" id="checkNipButton" type="button">Cek</button>
+            </div>
+            <p class="small muted" id="nipResult" aria-live="polite">Pengecekan hanya menampilkan status terdaftar, bukan data profil.</p>
+          </div>
+          <div class="field">
+            <label for="enrollmentToken">Token aktivasi sekali pakai</label>
+            <input id="enrollmentToken" autocomplete="one-time-code" required minlength="40" maxlength="64" placeholder="Token yang diberikan admin">
+          </div>
+          <div class="field">
+            <label for="password">Buat kata sandi</label>
+            <input id="password" type="password" autocomplete="new-password" required minlength="10" placeholder="Minimal 10 karakter">
+          </div>
+          <div class="field">
+            <label for="confirmPassword">Ulangi kata sandi</label>
+            <input id="confirmPassword" type="password" autocomplete="new-password" required minlength="10">
+          </div>
+          <button class="button" id="continueButton" type="submit" disabled>Lanjut ke pendaftaran wajah</button>
+        </form>
+
+        <section id="cameraStep" class="hidden" aria-labelledby="cameraTitle">
+          <p class="eyebrow" style="margin-top:26px">Langkah 2 dari 2</p>
+          <h2 id="cameraTitle">Rekam sampel wajah</h2>
+          <p class="lead">Izinkan kamera. Ambil lima sampel dengan posisi wajah sedikit bervariasi. Foto tetap di perangkat; hanya embedding yang dikirim ke server.</p>
+          <div class="camera-frame" style="margin-top:15px">
+            <video id="registerVideo" autoplay muted playsinline aria-label="Pratinjau kamera"></video>
+            <div id="cameraOverlay" class="camera-overlay">Kamera belum diaktifkan.</div>
+          </div>
+          <p id="modelStatus" class="camera-caption" role="status">Model lokal belum dimuat.</p>
+          <p id="scanProgress" class="camera-caption">Sampel 0 dari 5.</p>
+          <div class="row-actions">
+            <button class="button secondary" id="startCameraButton" type="button">Aktifkan kamera</button>
+            <button class="button" id="captureButton" type="button" disabled>Ambil sampel 1/5</button>
+          </div>
+          <button class="button" id="saveEnrollmentButton" type="button" disabled style="width:100%;margin-top:10px">Simpan aktivasi</button>
+          <p class="small muted" style="margin-top:12px">Jaga cahaya cukup, lepaskan penutup wajah, dan lihat langsung ke kamera. Enrollment membutuhkan model pengenalan wajah yang tersedia.</p>
+        </section>
+
+        <p class="auth-footer">Sudah aktif? <a class="text-link" href="index.html">Kembali ke login</a></p>
+      </section>
+    </div>
+  </main>
+  <script src="js/config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js" crossorigin="anonymous"></script>
+  <script src="js/shared.js"></script>
+  <script src="js/liveness.js"></script>
+  <script src="js/register.js"></script>
+</body>
+</html>
