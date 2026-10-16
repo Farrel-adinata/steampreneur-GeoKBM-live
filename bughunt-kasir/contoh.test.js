@@ -11,7 +11,7 @@
 
 const test = require("node:test");
 const assert = require("node:assert");
-const kasir = require("../kasir.js");
+const kasir = require("./kasir.js");
 
 test("subtotal dua produk berbeda dihitung dari harga x jumlah", () => {
   const keranjang = [];

@@ -62,7 +62,7 @@ function render() {
 document.getElementById("form-tambah").addEventListener("submit", function (e) {
   e.preventDefault();
   try {
-    tambahItem(keranjang, elProduk.value, elQty.value);
+    tambahItem(keranjang, elProduk.value, Number(elQty.value));
     tampilkanPesan("", "");
     elQty.value = 1;
     render();
