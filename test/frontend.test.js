@@ -8,7 +8,9 @@ const vm = require("node:vm");
 
 const projectRoot = path.resolve(__dirname, "..");
 const guruRoot = path.join(projectRoot, "src", "frontend", "guru");
+const siswaRoot = path.join(projectRoot, "src", "frontend", "siswa");
 const javascriptRoot = path.join(guruRoot, "js");
+const studentJavascriptRoot = path.join(siswaRoot, "js");
 const pageScripts = {
   "index.html": "login.js",
   "register.html": "register.js",
@@ -80,6 +82,32 @@ test("guru pages and their local assets exist", () => {
   }
 });
 
+test("student pages and their local assets exist", () => {
+  const studentPageScripts = {
+    "index.html": "login.js",
+    "home.html": "home.js",
+    "jurnal.html": "jurnal.js",
+    "laporan.html": "laporan.js",
+  };
+  for (const [pageName, scriptName] of Object.entries(studentPageScripts)) {
+    const pagePath = path.join(siswaRoot, pageName);
+    const html = readFile(pagePath);
+    assert.match(html, /<html lang="id">/, `${pageName} declares Indonesian language`);
+    assert.match(html, new RegExp(`src="js/${scriptName}"`), `${pageName} loads ${scriptName}`);
+    assert.ok(fs.existsSync(path.join(studentJavascriptRoot, scriptName)), `${scriptName} exists`);
+    assert.ok(fs.existsSync(path.join(siswaRoot, "css", "siswa.css")), "student stylesheet exists");
+
+    for (const [, reference] of html.matchAll(/(?:src|href)="([^"]+)"/g)) {
+      if (/^(?:https?:|mailto:|tel:|#)/.test(reference)) continue;
+      const localPath = reference.split(/[?#]/, 1)[0];
+      assert.ok(
+        fs.existsSync(path.resolve(path.dirname(pagePath), localPath)),
+        `${pageName} local reference exists: ${reference}`,
+      );
+    }
+  }
+});
+
 test("page scripts only query elements present in their page", () => {
   for (const [pageName, scriptName] of Object.entries(pageScripts)) {
     const html = readFile(path.join(guruRoot, pageName));
@@ -91,6 +119,23 @@ test("page scripts only query elements present in their page", () => {
     );
 
     for (const id of queriedIds) {
+      assert.ok(ids.has(id), `${scriptName} refers to missing #${id} in ${pageName}`);
+    }
+  }
+});
+
+test("student page scripts only query elements present in their page", () => {
+  const studentPageScripts = {
+    "index.html": "login.js",
+    "home.html": "home.js",
+    "jurnal.html": "jurnal.js",
+    "laporan.html": "laporan.js",
+  };
+  for (const [pageName, scriptName] of Object.entries(studentPageScripts)) {
+    const html = readFile(path.join(siswaRoot, pageName));
+    const script = readFile(path.join(studentJavascriptRoot, scriptName));
+    const ids = new Set(Array.from(html.matchAll(/\bid="([^"]+)"/g), match => match[1]));
+    for (const [, id] of script.matchAll(/getElementById\("([^"]+)"\)/g)) {
       assert.ok(ids.has(id), `${scriptName} refers to missing #${id} in ${pageName}`);
     }
   }
@@ -112,6 +157,49 @@ test("API configuration uses the local backend or deployed page origin", () => {
     configure({ hostname: "geokbm.example", protocol: "https:", origin: "https://geokbm.example" }),
     "https://geokbm.example",
   );
+});
+
+test("student API uses the backend session and CSRF token", async () => {
+  const sessionValues = new Map();
+  const requests = [];
+  const context = {
+    Headers,
+    Promise,
+    String,
+    JSON,
+    sessionStorage: {
+      getItem: key => sessionValues.get(key) ?? null,
+      setItem: (key, value) => sessionValues.set(key, String(value)),
+      removeItem: key => sessionValues.delete(key),
+    },
+    fetch: async (url, options) => {
+      requests.push({ url, options });
+      const payload = url.endsWith("/api/auth/csrf")
+        ? { csrf_token: "student-test-token" }
+        : { data_siswa: { id_siswa: 1 } };
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify(payload),
+      };
+    },
+    window: { GEOKBM_ENV: { API_BASE: "https://students.example.test" } },
+  };
+  vm.runInNewContext(readFile(path.join(studentJavascriptRoot, "shared.js")), context, {
+    filename: "student-shared.js",
+  });
+
+  const result = await context.window.GeoSiswa.api("/api/siswa/login", {
+    method: "POST",
+    body: { username: "student-nis", password: "test-password" },
+  });
+
+  assert.deepEqual(result.data_siswa, { id_siswa: 1 });
+  assert.equal(requests.length, 2);
+  assert.equal(requests[0].url, "https://students.example.test/api/auth/csrf");
+  assert.equal(requests[1].url, "https://students.example.test/api/siswa/login");
+  assert.equal(requests[1].options.credentials, "include");
+  assert.equal(requests[1].options.headers.get("X-CSRF-Token"), "student-test-token");
 });
 
 test("registration displays and clears the checked teacher name", async () => {
@@ -170,6 +258,15 @@ test("all teacher portal JavaScript files parse", () => {
   for (const fileName of fs.readdirSync(javascriptRoot).filter(name => name.endsWith(".js"))) {
     assert.doesNotThrow(
       () => new vm.Script(readFile(path.join(javascriptRoot, fileName)), { filename: fileName }),
+      `${fileName} has valid JavaScript syntax`,
+    );
+  }
+});
+
+test("all student portal JavaScript files parse", () => {
+  for (const fileName of fs.readdirSync(studentJavascriptRoot).filter(name => name.endsWith(".js"))) {
+    assert.doesNotThrow(
+      () => new vm.Script(readFile(path.join(studentJavascriptRoot, fileName)), { filename: fileName }),
       `${fileName} has valid JavaScript syntax`,
     );
   }

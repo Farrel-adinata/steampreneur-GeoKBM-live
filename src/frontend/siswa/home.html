@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#059669">
+  <title>Beranda Siswa — GeoKBM Live</title>
+  <link rel="stylesheet" href="css/siswa.css">
+</head>
+<body>
+  <header class="student-hero">
+    <div class="hero-top">
+      <div>
+        <p class="eyebrow">Selamat datang</p>
+        <h1 id="studentGreeting">Memuat akun…</h1>
+        <p id="classLabel">—</p>
+      </div>
+      <button class="button button-light button-small" id="logoutButton" type="button">Keluar</button>
+    </div>
+    <div class="stats-grid">
+      <article class="stat-card"><span>Jurnal hari ini</span><strong id="todayCount">Memuat…</strong></article>
+      <article class="stat-card"><span>Minggu ini</span><strong id="weekCount">Memuat…</strong></article>
+      <article class="stat-card"><span>Guru hadir</span><strong id="presentCount">—</strong></article>
+      <article class="stat-card"><span>Tidak hadir</span><strong id="absentCount">—</strong></article>
+    </div>
+  </header>
+
+  <main class="student-main">
+    <div id="homeMessage" class="notice" role="status" aria-live="polite" hidden></div>
+    <section class="quick-actions" aria-label="Aksi cepat">
+      <a class="action-card action-green" href="jurnal.html"><span aria-hidden="true">▤</span><strong>Isi Jurnal KBM</strong></a>
+      <a class="action-card action-blue" href="laporan.html"><span aria-hidden="true">▥</span><strong>Laporan Jurnal</strong></a>
+    </section>
+    <section class="panel">
+      <div class="panel-heading">
+        <div><p class="eyebrow">Ringkasan</p><h2 id="todayHeading">Jurnal hari ini</h2></div>
+        <a class="text-link" href="jurnal.html">Lihat jadwal</a>
+      </div>
+      <div id="todayJournal" class="record-list" aria-live="polite">
+        <p class="empty-state">Memuat jurnal hari ini…</p>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" aria-label="Navigasi siswa">
+    <a class="nav-link active" href="home.html" aria-current="page"><span aria-hidden="true">⌂</span>Beranda</a>
+    <a class="nav-link" href="jurnal.html"><span aria-hidden="true">▤</span>Jurnal</a>
+    <a class="nav-link" href="laporan.html"><span aria-hidden="true">▥</span>Laporan</a>
+    <button class="nav-link logout-link" id="logoutNavButton" type="button"><span aria-hidden="true">↪</span>Keluar</button>
+  </nav>
+  <script src="js/config.js"></script>
+  <script src="js/shared.js"></script>
+  <script src="js/home.js"></script>
+</body>
+</html>

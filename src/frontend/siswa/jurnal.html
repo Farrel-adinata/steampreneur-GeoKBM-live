@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#059669">
+  <title>Jurnal KBM — GeoKBM Live</title>
+  <link rel="stylesheet" href="css/siswa.css">
+</head>
+<body class="jurnal-page">
+  <header class="page-hero">
+    <p class="eyebrow">Jurnal KBM</p>
+    <h1>Isi jurnal harian</h1>
+    <p>Pilih tanggal dan jam pelajaran, lalu catat kehadiran guru.</p>
+  </header>
+  <main class="student-main">
+    <div id="journalMessage" class="notice" role="alert" aria-live="polite" hidden></div>
+    <section class="panel">
+      <div class="field">
+        <label for="dateInput">Tanggal jurnal</label>
+        <input id="dateInput" type="date" required>
+      </div>
+      <p class="day-label">Hari: <strong id="dayLabel">—</strong></p>
+    </section>
+    <section class="panel">
+      <div class="panel-heading"><div><p class="eyebrow">Jadwal kelas</p><h2>Pilih jam pelajaran</h2></div></div>
+      <div id="scheduleList" class="schedule-list" aria-live="polite">
+        <p class="empty-state">Pilih tanggal untuk memuat jadwal.</p>
+      </div>
+    </section>
+    <section id="journalFormPanel" class="panel hidden">
+      <div class="panel-heading"><div><p class="eyebrow">Entri jurnal</p><h2>Catat kehadiran guru</h2></div></div>
+      <div class="selected-class">
+        <strong id="selectedSubject">Pilih jam pelajaran</strong>
+        <span id="selectedTeacher">—</span>
+        <span id="selectedTime">—</span>
+      </div>
+      <form id="journalForm" class="form-stack" novalidate>
+        <div class="field">
+          <label for="teacherStatus">Status kehadiran guru</label>
+          <select id="teacherStatus" required>
+            <option value="">Pilih status</option>
+            <option value="Hadir">Hadir</option>
+            <option value="Tidak Hadir">Tidak Hadir</option>
+            <option value="Izin">Izin</option>
+            <option value="Sakit">Sakit</option>
+            <option value="Diganti">Diganti</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="studentNote">Catatan <span class="optional">(opsional)</span></label>
+          <textarea id="studentNote" maxlength="5000" rows="4" placeholder="Tambahkan catatan kegiatan KBM"></textarea>
+        </div>
+        <button class="button" id="saveJournalButton" type="submit">Simpan jurnal</button>
+      </form>
+    </section>
+  </main>
+  <nav class="bottom-nav" aria-label="Navigasi siswa">
+    <a class="nav-link" href="home.html"><span aria-hidden="true">⌂</span>Beranda</a>
+    <a class="nav-link active" href="jurnal.html" aria-current="page"><span aria-hidden="true">▤</span>Jurnal</a>
+    <a class="nav-link" href="laporan.html"><span aria-hidden="true">▥</span>Laporan</a>
+    <button class="nav-link logout-link" id="logoutNavButton" type="button"><span aria-hidden="true">↪</span>Keluar</button>
+  </nav>
+  <script src="js/config.js"></script>
+  <script src="js/shared.js"></script>
+  <script src="js/jurnal.js"></script>
+</body>
+</html>
