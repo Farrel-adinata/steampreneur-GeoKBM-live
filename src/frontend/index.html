@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#1e3a8a">
+  <meta name="description" content="GeoKBM Live — sistem monitoring kegiatan belajar mengajar SMK Negeri 1 Kuwus.">
+  <title>GeoKBM Live — Pilih Portal</title>
+  <link rel="stylesheet" href="css/onboarding.css">
+</head>
+<body>
+  <main class="onboarding" id="onboarding" aria-label="Pengenalan GeoKBM Live">
+    <div class="background-glow glow-one" aria-hidden="true"></div>
+    <div class="background-glow glow-two" aria-hidden="true"></div>
+
+    <button class="skip-button" id="skipButton" type="button">Lewati pengenalan</button>
+
+    <div class="slides-viewport">
+      <div class="slides-track" id="slidesTrack">
+        <section class="slide welcome-slide" aria-labelledby="welcomeTitle">
+          <div class="slide-content">
+            <div class="hero-icon school-icon" aria-hidden="true">⌂</div>
+            <p class="eyebrow">Selamat datang</p>
+            <h1 id="welcomeTitle">GeoKBM Live</h1>
+            <p class="school-name">SMK Negeri 1 Kuwus · NTT</p>
+            <p class="slide-description">Sistem informasi monitoring kegiatan belajar mengajar digital untuk sekolah modern.</p>
+          </div>
+        </section>
+
+        <section class="slide feature-slide" aria-labelledby="featureTitle">
+          <div class="slide-content">
+            <div class="feature-illustration" aria-hidden="true">
+              <div class="face-frame"><span class="face-icon">☺</span><span class="scan-beam"></span></div>
+              <div class="location-chip"><span aria-hidden="true">⌖</span> Verifikasi lokasi sekolah</div>
+            </div>
+            <p class="eyebrow">Presensi terverifikasi</p>
+            <h2 id="featureTitle">Wajah dan lokasi, dalam satu alur</h2>
+            <p class="slide-description">Guru melakukan presensi dengan verifikasi wajah dan pemeriksaan GPS. Ketua kelas dapat mengisi jurnal serta memantau KBM.</p>
+            <div class="feature-pills">
+              <span>Verifikasi wajah</span>
+              <span>Validasi GPS</span>
+              <span>Jurnal KBM</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide portal-slide" aria-labelledby="portalTitle">
+          <div class="slide-content portal-content">
+            <div class="hero-icon portal-icon" aria-hidden="true">↗</div>
+            <p class="eyebrow">Mulai sekarang</p>
+            <h2 id="portalTitle">Pilih portal Anda</h2>
+            <p class="slide-description">Pilih peran untuk melanjutkan ke halaman masuk.</p>
+            <div class="portal-options">
+              <a class="portal-card teacher-card" href="guru/index.html" data-portal="guru">
+                <span class="portal-icon-small" aria-hidden="true">▦</span>
+                <span class="portal-copy"><strong>Masuk sebagai Guru</strong><small>Presensi wajah, GPS, dan jurnal mengajar</small></span>
+                <span class="portal-arrow" aria-hidden="true">→</span>
+              </a>
+              <a class="portal-card student-card" href="siswa/index.html" data-portal="siswa">
+                <span class="portal-icon-small" aria-hidden="true">♙</span>
+                <span class="portal-copy"><strong>Masuk sebagai Siswa</strong><small>Jurnal KBM dan laporan kelas · ketua kelas</small></span>
+                <span class="portal-arrow" aria-hidden="true">→</span>
+              </a>
+            </div>
+            <p class="version-label">Sistem Presensi &amp; Monitoring KBM Digital</p>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <footer class="slide-controls">
+      <div class="slide-dots" aria-label="Pilih halaman pengenalan">
+        <button type="button" class="slide-dot active" data-slide="0" aria-label="Halaman 1" aria-current="step"></button>
+        <button type="button" class="slide-dot" data-slide="1" aria-label="Halaman 2"></button>
+        <button type="button" class="slide-dot" data-slide="2" aria-label="Halaman 3"></button>
+      </div>
+      <button class="next-button" id="nextButton" type="button">
+        <span>Lanjut</span><span aria-hidden="true">→</span>
+      </button>
+    </footer>
+  </main>
+  <script src="js/onboarding.js"></script>
+</body>
+</html>

@@ -7,6 +7,8 @@ const test = require("node:test");
 const vm = require("node:vm");
 
 const projectRoot = path.resolve(__dirname, "..");
+const frontendRoot = path.join(projectRoot, "src", "frontend");
+const onboardingRoot = frontendRoot;
 const guruRoot = path.join(projectRoot, "src", "frontend", "guru");
 const siswaRoot = path.join(projectRoot, "src", "frontend", "siswa");
 const javascriptRoot = path.join(guruRoot, "js");
@@ -80,6 +82,58 @@ test("guru pages and their local assets exist", () => {
       );
     }
   }
+});
+
+test("onboarding page links to both portals and its local script/style", () => {
+  const html = readFile(path.join(onboardingRoot, "index.html"));
+  assert.match(html, /href="guru\/index\.html"[^>]*data-portal="guru"/);
+  assert.match(html, /href="siswa\/index\.html"[^>]*data-portal="siswa"/);
+  assert.ok(fs.existsSync(path.join(frontendRoot, "js", "onboarding.js")));
+  assert.ok(fs.existsSync(path.join(frontendRoot, "css", "onboarding.css")));
+  for (const [, reference] of html.matchAll(/(?:src|href)="([^"]+)"/g)) {
+    if (/^(?:https?:|mailto:|tel:|#)/.test(reference)) continue;
+    assert.ok(fs.existsSync(path.resolve(frontendRoot, reference)), `onboarding asset exists: ${reference}`);
+  }
+});
+
+test("onboarding JavaScript supports browsing slides and persists completed intro", () => {
+  const listeners = new Map();
+  const slidesTrack = { style: {} };
+  const makeControl = dataset => ({
+    dataset,
+    classList: { toggle() {} },
+    addEventListener: (name, handler) => listeners.set(`${dataset.slide ?? "control"}:${name}`, handler),
+    setAttribute() {},
+    removeAttribute() {},
+  });
+  const dotControls = [0, 1, 2].map(slide => makeControl({ slide: String(slide) }));
+  const controls = new Map([
+    ["slidesTrack", slidesTrack],
+    ["onboarding", { clientWidth: 400, addEventListener: (name, handler) => listeners.set(`onboarding:${name}`, handler) }],
+    ["nextButton", { hidden: false, addEventListener: (name, handler) => listeners.set(`next:${name}`, handler) }],
+    ["skipButton", { hidden: false, addEventListener: (name, handler) => listeners.set(`skip:${name}`, handler) }],
+  ]);
+  const stored = new Map();
+  const context = {
+    document: {
+      getElementById: id => controls.get(id),
+      querySelectorAll: () => dotControls,
+    },
+    localStorage: {
+      getItem: key => stored.get(key) ?? null,
+      setItem: (key, value) => stored.set(key, value),
+    },
+    Number,
+    Math,
+  };
+  vm.runInNewContext(readFile(path.join(frontendRoot, "js", "onboarding.js")), context);
+
+  assert.equal(slidesTrack.style.transform, "translateX(0%)");
+  listeners.get("next:click")();
+  assert.equal(slidesTrack.style.transform, "translateX(-100%)");
+  listeners.get("skip:click")();
+  assert.equal(slidesTrack.style.transform, "translateX(-200%)");
+  assert.equal(stored.get("geokbm_onboarding_done"), "1");
 });
 
 test("student pages and their local assets exist", () => {
